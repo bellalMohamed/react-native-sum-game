@@ -23,6 +23,19 @@ class Game extends React.Component {
         .slice(0, this.props.randomNumberCount - 2)
         .reduce((acc, curr) => acc + curr, 0)
 
+    shuffledRandomNumbers = this.shuffle(this.randomNumbers);
+    shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+        while (0 !== currentIndex) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+        return array;
+    }
+
     componentDidMount() {
         this.intervalId = setInterval(() => {
             this.setState((prevState) => {
@@ -41,7 +54,7 @@ class Game extends React.Component {
     isNumberSelected = (numberIndex) => {
         return this.state.selectedIds.indexOf(numberIndex) >= 0;
     }
-    // TODO: do something
+
     UNSAFE_componentWillUpdate(nextProps, nextState) {
         if (
             nextState.selectedIds !== this.state.selectedIds ||
@@ -56,7 +69,7 @@ class Game extends React.Component {
 
     calcGameStatus = (nextState) => {
         const sumSelected = nextState.selectedIds.reduce((acc, curr) => {
-            return acc + this.randomNumbers[curr];
+            return acc + this.shuffledRandomNumbers[curr];
         }, 0);
         if (nextState.remainingSeconds === 0) {
             return 'LOST';
@@ -83,7 +96,7 @@ class Game extends React.Component {
             <View style={styles.container}>
                 <Text style={[styles.target, styles[`STATUS_${gameStatus}`]]}>{this.target}</Text>
                 <View style={styles.randomContainer}>
-                    {this.randomNumbers.map((randomNumber, index) =>
+                    {this.shuffledRandomNumbers.map((randomNumber, index) =>
                         <RandomNumber
                             key={index}
                             id={index}
